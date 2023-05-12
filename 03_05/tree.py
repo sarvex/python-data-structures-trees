@@ -46,36 +46,29 @@ class Node:
         return max(leftHeight, rightHeight)
 
     def toStr(self):
-        if not self.isBalanced():
-            return str(self.data)+'*'
-        return str(self.data)
+        return f'{str(self.data)}*' if not self.isBalanced() else str(self.data)
 
     def findMax(self):
-        if self.right:
-            return self.right.findMax()
-        return self
+        return self.right.findMax() if self.right else self
 
     def findMin(self):
-        if self.left:
-            return self.left.findMin()
-        return self
+        return self.left.findMin() if self.left else self
 
     def delete(self, data):
         if self.data == data:
-            if self.right and self.left:
-                minimumValue = self.right.findMin()
-                self.data = minimumValue.data
-                self.right = self.right.delete(minimumValue.data)
-                return self
-            else: 
+            if not self.right or not self.left:
                 return self.right or self.left
-        
+
+            minimumValue = self.right.findMin()
+            self.data = minimumValue.data
+            self.right = self.right.delete(minimumValue.data)
+            return self
         if self.right and data > self.data:
                 self.right = self.right.delete(data)
 
         if self.left and data < self.data:
                 self.left = self.left.delete(data)
-        
+
         return self.fixImbalanceIfExists()
 
 
@@ -131,23 +124,17 @@ class Node:
     def fixImbalanceIfExists(self):
         
         if self.getLeftRightHeightDifference() > 1:
-            if self.left.getLeftRightHeightDifference() > 0:
-                # Left left imbalance
-                return rotateRight(self)
-            else:
+            if self.left.getLeftRightHeightDifference() <= 0:
                 # Left Right imbalance
                 self.left = rotateLeft(self.left)
-                return rotateRight(self)
-
+            # Left left imbalance
+            return rotateRight(self)
         if self.getLeftRightHeightDifference() < -1:
-            if self.right.getLeftRightHeightDifference() < 0:
-                # Right right imbalance
-                return rotateLeft(self)
-            else:
+            if self.right.getLeftRightHeightDifference() >= 0:
                 # Right Left imbalance
                 self.right = rotateRight(self.right)
-                return rotateLeft(self)
-
+            # Right right imbalance
+            return rotateLeft(self)
         return self
 
     def rebalance(self):
@@ -191,7 +178,7 @@ class Tree:
         return n.toStr()+(' '*spacing)
 
     def print(self, label=''):
-        print(self.name+' '+label)
+        print(f'{self.name} {label}')
         height = self.root.height()
         spacing = 3
         width = int((2**height-1) * (spacing+1) + 1)

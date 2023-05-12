@@ -5,9 +5,7 @@ class Node:
         self.right = None
 
     def toStr(self):
-        if not self.isBalanced():
-            return str(self.data)+'*'
-        return str(self.data)
+        return f'{str(self.data)}*' if not self.isBalanced() else str(self.data)
 
     def traversePreorder(self):
         print(self.data)
@@ -84,20 +82,17 @@ class Node:
                 self.right.add(data)
 
     def findMin(self):
-        if self.left:
-            return self.left.findMin()
-        return self
+        return self.left.findMin() if self.left else self
 
     def delete(self, target):
         if self.data == target:
-            if self.right and self.left:
-                minimumValue = self.right.findMin()
-                self.data = minimumValue.data
-                self.right = self.right.delete(minimumValue.data)
-                return self
-            else: 
+            if not self.right or not self.left:
                 return self.right or self.left
-        
+
+            minimumValue = self.right.findMin()
+            self.data = minimumValue.data
+            self.right = self.right.delete(minimumValue.data)
+            return self
         if self.right and target > self.data:
                 self.right = self.right.delete(target)
 
@@ -117,18 +112,13 @@ class Node:
 
     def fixImbalanceIfExists(self):
         if self.getLeftRightHeightDifference() > 1:
-            if self.left.getLeftRightHeightDifference() > 0:
-                return rotateRight(self)
-            else:
+            if self.left.getLeftRightHeightDifference() <= 0:
                 self.left = rotateLeft(self.left)
-                return rotateRight(self)
-
+            return rotateRight(self)
         if self.getLeftRightHeightDifference() < -1:
-            if self.right.getLeftRightHeightDifference() < 0:
-                return rotateLeft(self)
-            else:
+            if self.right.getLeftRightHeightDifference() >= 0:
                 self.right = rotateRight(self.right)
-                return rotateLeft(self)
+            return rotateLeft(self)
 
     def rebalance(self):
         if self.left:
@@ -150,7 +140,7 @@ class Tree:
         return n.toStr()+(' '*spacing)
 
     def print(self, label=''):
-        print(self.name+' '+label)
+        print(f'{self.name} {label}')
         height = self.root.height()
         spacing = 3
         width = int((2**height-1) * (spacing+1) + 1)

@@ -90,7 +90,7 @@ class Tree:
         return str(n)+(' '*spacing)
 
     def print(self, label=''):
-        print(self.name+' '+label)
+        print(f'{self.name} {label}')
         height = self.root.height()
         spacing = 3
         width = int((2**height-1) * (spacing+1) + 1)
